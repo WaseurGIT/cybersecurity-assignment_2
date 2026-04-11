@@ -1,10 +1,13 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useState } from "react";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
+import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 
 const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-red-200 dark:from-zinc-900 dark:to-black">
       <Link
@@ -25,7 +28,7 @@ const LoginPage = () => {
 
         <div className="w-full md:w-1/2 flex flex-col justify-center px-10">
           <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-            Welcome Back 🍽️
+            Welcome Back
           </h2>
 
           <p className="text-gray-500 mb-6">Login to explore delicious meals</p>
@@ -42,10 +45,16 @@ const LoginPage = () => {
           <div className="flex items-center border rounded-lg px-3 py-2 mb-4 bg-gray-50 dark:bg-zinc-800">
             <FaLock className="text-gray-400 mr-2" />
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               placeholder="Password"
               className="w-full bg-transparent outline-none text-gray-700 dark:text-white"
             />
+            <div
+              onClick={() => setShowPassword(!showPassword)}
+              className="cursor-pointer text-gray-400"
+            >
+              {showPassword ? <IoIosEye /> : <IoIosEyeOff />}
+            </div>
           </div>
 
           <div className="flex justify-between items-center text-sm mb-4">
@@ -75,9 +84,12 @@ const LoginPage = () => {
 
           <p className="text-sm text-center mt-4 text-gray-600 dark:text-gray-400">
             Don’t have an account?{" "}
-            <span className="text-orange-500 cursor-pointer hover:underline">
+            <Link
+              href="/register"
+              className="text-orange-500 cursor-pointer hover:underline"
+            >
               Sign up
-            </span>
+            </Link>
           </p>
         </div>
       </div>

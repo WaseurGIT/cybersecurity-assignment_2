@@ -4,6 +4,8 @@ import React, { useState } from "react";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
+import axiosSecure from "../api/axiosSecure";
+import Swal from "sweetalert2";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,12 +16,56 @@ const LoginPage = () => {
     const email = form.email.value;
     const password = form.password.value;
 
+    if (!email || !password) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Please fill in all required fields.",
+        confirmButtonText: "OK",
+      });
+      return;
+    } else if (password.length < 6) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Password must be at least 6 characters long.",
+        confirmButtonText: "OK",
+      });
+      return;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      Swal.fire({
+        icon: "error",
+        title: "Login Failed",
+        text: "Please enter a valid email address.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
     const formData = {
       email,
       password,
     };
 
-    console.log(formData);
+    axiosSecure
+      .post("/login", formData)
+      .then((res) => {
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "You have logged in successfully!",
+          confirmButtonText: "OK",
+        });
+        form.reset();
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text:
+            err.response?.data?.message || "An error occurred during login.",
+          confirmButtonText: "OK",
+        });
+      });
   };
 
   return (
@@ -40,12 +86,17 @@ const LoginPage = () => {
           />
         </div>
 
-        <form className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-10 py-8" onSubmit={handleLoginForm}>
+        <form
+          className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-10 py-8"
+          onSubmit={handleLoginForm}
+        >
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-2">
             Welcome Back
           </h2>
 
-          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm md:text-base">Login to explore delicious meals</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm md:text-base">
+            Login to explore delicious meals
+          </p>
 
           <div className="flex items-center border-2 border-gray-300 dark:border-zinc-700 rounded-lg px-4 py-3 mb-4 bg-gray-50 dark:bg-zinc-800 hover:border-orange-500 transition-colors">
             <FaUser className="text-gray-500 dark:text-gray-400 mr-3" />
@@ -72,7 +123,11 @@ const LoginPage = () => {
               onClick={() => setShowPassword(!showPassword)}
               className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors"
             >
-              {showPassword ? <IoIosEye size={20} /> : <IoIosEyeOff size={20} />}
+              {showPassword ? (
+                <IoIosEye size={20} />
+              ) : (
+                <IoIosEyeOff size={20} />
+              )}
             </button>
           </div>
 
@@ -81,12 +136,18 @@ const LoginPage = () => {
               <input type="checkbox" className="cursor-pointer" />
               Remember me
             </label>
-            <a href="#" className="text-orange-500 hover:text-orange-600 font-medium transition-colors">
+            <a
+              href="#"
+              className="text-orange-500 hover:text-orange-600 font-medium transition-colors"
+            >
               Forgot password?
             </a>
           </div>
 
-          <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg">
+          <button
+            type="submit"
+            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
+          >
             Login
           </button>
 
@@ -96,7 +157,10 @@ const LoginPage = () => {
             <hr className="flex-1 border-gray-300 dark:border-zinc-700" />
           </div>
 
-          <button type="button" className="border-2 border-gray-300 dark:border-zinc-700 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-zinc-800 transition duration-200 font-medium">
+          <button
+            type="button"
+            className="border-2 border-gray-300 dark:border-zinc-700 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-zinc-800 transition duration-200 font-medium"
+          >
             <FcGoogle size={20} />
             Continue with Google
           </button>

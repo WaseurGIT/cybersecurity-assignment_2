@@ -4,10 +4,15 @@ import Link from "next/link";
 import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaArrowLeft } from "react-icons/fa";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
+import axiosSecure from "../api/axiosSecure";
+import Swal from "sweetalert2";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const strongPasswordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
 
   const handleRegisterForm = (e) => {
     e.preventDefault();
@@ -17,6 +22,48 @@ export default function RegisterPage() {
     const password = form.password.value;
     const confirmPassword = form.confirmPassword.value;
 
+    if (!name || !email || !password || !confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Please fill in all required fields.",
+        confirmButtonText: "OK",
+      });
+      return;
+    } else if (password.length < 8) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Password must be at least 8 characters long.",
+        confirmButtonText: "OK",
+      });
+      return;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Please enter a valid email address.",
+        confirmButtonText: "OK",
+      });
+      return;
+    } else if (password !== confirmPassword) {
+      Swal.fire({
+        icon: "error",
+        title: "Registration Failed",
+        text: "Passwords do not match.",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+    if (!strongPasswordRegex.test(password)) {
+      Swal.fire({
+        icon: "error",
+        title: "Weak Password",
+        text: "Password must include uppercase, lowercase, number, and special character.",
+      });
+      return;
+    }
+
     const formData = {
       name,
       email,
@@ -24,7 +71,26 @@ export default function RegisterPage() {
       confirmPassword,
     };
 
-    console.log(formData);
+    axiosSecure("/users", formData)
+      .then((res) => {
+        Swal.fire({
+          icon: "success",
+          title: "Registration Successful",
+          text: "You have registered successfully!",
+          confirmButtonText: "OK",
+        });
+        form.reset();
+      })
+      .catch((err) => {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text:
+            err.response?.data?.message ||
+            "An error occurred during registration.",
+          confirmButtonText: "OK",
+        });
+      });
   };
 
   return (
@@ -45,7 +111,10 @@ export default function RegisterPage() {
           />
         </div>
 
-        <form onSubmit={handleRegisterForm} className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-10 py-8">
+        <form
+          onSubmit={handleRegisterForm}
+          className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-10 py-8"
+        >
           <h1 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-2">
             Create Account
           </h1>
@@ -90,7 +159,11 @@ export default function RegisterPage() {
               onClick={() => setShowPassword(!showPassword)}
               className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors"
             >
-              {showPassword ? <IoIosEye size={20} /> : <IoIosEyeOff size={20} />}
+              {showPassword ? (
+                <IoIosEye size={20} />
+              ) : (
+                <IoIosEyeOff size={20} />
+              )}
             </button>
           </div>
 
@@ -108,7 +181,11 @@ export default function RegisterPage() {
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors"
             >
-              {showConfirmPassword ? <IoIosEye size={20} /> : <IoIosEyeOff size={20} />}
+              {showConfirmPassword ? (
+                <IoIosEye size={20} />
+              ) : (
+                <IoIosEyeOff size={20} />
+              )}
             </button>
           </div>
 

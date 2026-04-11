@@ -3,35 +3,41 @@ import React from "react";
 
 const FoodCard = ({ food }) => {
   return (
-    <div className="bg-white dark:bg-zinc-900 shadow-md rounded-xl p-4 m-2 w-96">
-      <img
-        src={food.image}
-        alt={food.name}
-        className="w-full h-40 object-cover rounded-lg"
-      />
-
-      <h2 className="text-xl font-semibold mt-3 text-gray-800 dark:text-gray-200">
-        {food.name}
-      </h2>
-
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Category: {food.category}
-      </p>
-
-      <div className="flex justify-between mt-2">
-        <span className="text-green-600 font-bold">${food.price}</span>
-        <span className="text-yellow-500">⭐ {food.rating}</span>
+    <div className="bg-white dark:bg-zinc-900 shadow-md hover:shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 h-full flex flex-col">
+      <div className="overflow-hidden h-48">
+        <img
+          src={food.image}
+          alt={food.name}
+          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+        />
       </div>
 
-      <p
-        className={`mt-2 text-sm font-medium ${
-          food.isAvailable ? "text-green-500" : "text-red-500"
-        }`}
-      >
-        {food.isAvailable ? "Available" : "Not Available"}
-      </p>
+      <div className="p-5 flex flex-col flex-1">
+        <h2 className="text-lg md:text-xl font-semibold text-gray-800 dark:text-gray-200 line-clamp-2">
+          {food.name}
+        </h2>
 
-      <div className="btn btn-accent mt-4 w-full text-white">Details</div>
+        <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 mt-1">
+          {food.category}
+        </p>
+
+        <div className="flex justify-between items-center mt-3 mb-3">
+          <span className="text-lg font-bold text-green-600 dark:text-green-400">${food.price}</span>
+          <span className="text-yellow-500 font-semibold">⭐ {food.rating}</span>
+        </div>
+
+        <p
+          className={`text-xs md:text-sm font-semibold mb-4 ${
+            food.isAvailable ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+          }`}
+        >
+          {food.isAvailable ? "✓ Available" : "✗ Not Available"}
+        </p>
+
+        <button className="mt-auto bg-orange-500 hover:bg-orange-600 w-full py-2 rounded-lg text-white font-semibold transition-colors duration-200">
+          View Details
+        </button>
+      </div>
     </div>
   );
 };

@@ -8,90 +8,109 @@ import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleLoginForm = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const email = form.email.value;
+    const password = form.password.value;
+
+    const formData = {
+      email,
+      password,
+    };
+
+    console.log(formData);
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-red-200 dark:from-zinc-900 dark:to-black">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-red-200 dark:from-zinc-900 dark:to-black p-4">
       <Link
         href="/"
-        className="absolute top-5 left-80 text-orange-500 hover:underline flex items-center gap-1"
+        className="absolute top-5 left-5 md:left-10 text-orange-500 hover:underline flex items-center gap-1 font-semibold"
       >
         <FaArrowLeft />
         Back to Home
       </Link>
-      <div className="flex w-[900px] h-[500px] bg-white dark:bg-zinc-900 rounded-2xl shadow-xl overflow-hidden">
-        <div className="w-1/2 hidden md:block">
+      <div className="flex w-full max-w-4xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden">
+        <div className="w-1/2 hidden md:flex items-center justify-center overflow-hidden">
           <img
             src="https://i.ibb.co.com/k2tj6ZrT/roasted-beans.jpg"
             alt="restaurant"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
           />
         </div>
 
-        <div className="w-full md:w-1/2 flex flex-col justify-center px-10">
-          <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+        <form className="w-full md:w-1/2 flex flex-col justify-center px-6 md:px-10 py-8" onSubmit={handleLoginForm}>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-800 dark:text-white mb-2">
             Welcome Back
           </h2>
 
-          <p className="text-gray-500 mb-6">Login to explore delicious meals</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-8 text-sm md:text-base">Login to explore delicious meals</p>
 
-          <div className="flex items-center border rounded-lg px-3 py-2 mb-4 bg-gray-50 dark:bg-zinc-800">
-            <FaUser className="text-gray-400 mr-2" />
+          <div className="flex items-center border-2 border-gray-300 dark:border-zinc-700 rounded-lg px-4 py-3 mb-4 bg-gray-50 dark:bg-zinc-800 hover:border-orange-500 transition-colors">
+            <FaUser className="text-gray-500 dark:text-gray-400 mr-3" />
             <input
               type="email"
+              name="email"
               placeholder="Email"
-              className="w-full bg-transparent outline-none text-gray-700 dark:text-white"
+              className="w-full bg-transparent outline-none text-gray-700 dark:text-white placeholder-gray-500"
+              required
             />
           </div>
 
-          <div className="flex items-center border rounded-lg px-3 py-2 mb-4 bg-gray-50 dark:bg-zinc-800">
-            <FaLock className="text-gray-400 mr-2" />
+          <div className="flex items-center border-2 border-gray-300 dark:border-zinc-700 rounded-lg px-4 py-3 mb-4 bg-gray-50 dark:bg-zinc-800 hover:border-orange-500 transition-colors">
+            <FaLock className="text-gray-500 dark:text-gray-400 mr-3" />
             <input
               type={showPassword ? "text" : "password"}
+              name="password"
               placeholder="Password"
-              className="w-full bg-transparent outline-none text-gray-700 dark:text-white"
+              className="w-full bg-transparent outline-none text-gray-700 dark:text-white placeholder-gray-500"
+              required
             />
-            <div
+            <button
+              type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="cursor-pointer text-gray-400"
+              className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-orange-500 transition-colors"
             >
-              {showPassword ? <IoIosEye /> : <IoIosEyeOff />}
-            </div>
+              {showPassword ? <IoIosEye size={20} /> : <IoIosEyeOff size={20} />}
+            </button>
           </div>
 
-          <div className="flex justify-between items-center text-sm mb-4">
-            <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-              <input type="checkbox" />
+          <div className="flex justify-between items-center text-sm mb-6">
+            <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+              <input type="checkbox" className="cursor-pointer" />
               Remember me
             </label>
-            <a href="#" className="text-orange-500 hover:underline">
+            <a href="#" className="text-orange-500 hover:text-orange-600 font-medium transition-colors">
               Forgot password?
             </a>
           </div>
 
-          <button className="bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg transition duration-200">
+          <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg">
             Login
           </button>
 
-          <div className="flex items-center my-4">
-            <hr className="flex-1 border-gray-300" />
-            <span className="mx-2 text-gray-400 text-sm">OR</span>
-            <hr className="flex-1 border-gray-300" />
+          <div className="flex items-center my-6">
+            <hr className="flex-1 border-gray-300 dark:border-zinc-700" />
+            <span className="mx-3 text-gray-500 text-sm font-medium">OR</span>
+            <hr className="flex-1 border-gray-300 dark:border-zinc-700" />
           </div>
 
-          <button className="border py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-zinc-800">
-            <FcGoogle />
+          <button type="button" className="border-2 border-gray-300 dark:border-zinc-700 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-gray-100 dark:hover:bg-zinc-800 transition duration-200 font-medium">
+            <FcGoogle size={20} />
             Continue with Google
           </button>
 
-          <p className="text-sm text-center mt-4 text-gray-600 dark:text-gray-400">
-            Don’t have an account?{" "}
+          <p className="text-sm text-center mt-6 text-gray-600 dark:text-gray-400">
+            Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-orange-500 cursor-pointer hover:underline"
+              className="text-orange-500 cursor-pointer hover:text-orange-600 font-semibold transition-colors"
             >
               Sign up
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );

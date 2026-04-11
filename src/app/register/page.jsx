@@ -6,10 +6,12 @@ import { FaUser, FaEnvelope, FaLock, FaArrowLeft } from "react-icons/fa";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import axiosSecure from "../api/axiosSecure";
 import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const router = useRouter();
 
   const strongPasswordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -68,10 +70,9 @@ export default function RegisterPage() {
       name,
       email,
       password,
-      confirmPassword,
     };
 
-    axiosSecure("/users", formData)
+    axiosSecure.post("/users", formData)
       .then((res) => {
         Swal.fire({
           icon: "success",
@@ -80,6 +81,7 @@ export default function RegisterPage() {
           confirmButtonText: "OK",
         });
         form.reset();
+        router.push('/');
       })
       .catch((err) => {
         Swal.fire({

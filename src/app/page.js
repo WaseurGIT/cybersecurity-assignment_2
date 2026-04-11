@@ -1,24 +1,35 @@
 "use client";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import FoodCard from "./components/FoodCard/page";
 import Link from "next/link";
+import { AuthContext } from "./AuthProvider";
+import axiosSecure from "./api/axiosSecure";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [foods, setFoods] = useState([]);
+  const { user, logout } = useContext(AuthContext);
+  const router = useRouter();
 
-  const navLinks = [
-    { name: "Home", path: "/" },
-    { name: "Login", path: "/login" },
-  ];
+  const handleLogout = async () => {
+    try {
+      await axiosSecure.post("/logout");
+      logout();
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const navLinks = [{ name: "Home", path: "/" }];
 
   useEffect(() => {
-    axios.get("foods.json").then((res) => setFoods(res.data));
+    axiosSecure.get("/foods").then((res) => setFoods(res.data));
   }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-zinc-50 dark:bg-black">
-      {/* Navigation Bar */}
       <nav className="bg-white dark:bg-zinc-900 shadow-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
@@ -35,12 +46,34 @@ export default function Home() {
                   {link.name}
                 </Link>
               ))}
+
+              {user ? (
+                <div className="flex items-center gap-4">
+                  <span className="text-gray-700 dark:text-gray-300 font-medium hidden sm:inline">
+                    {user.name || user.email}
+                  </span>
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition-colors duration-200"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-2 sm:gap-4">
+                  <Link
+                    href="/login"
+                    className="text-orange-500 hover:text-orange-600 font-semibold transition-colors"
+                  >
+                    Login
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
       <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-zinc-900 dark:to-zinc-800 py-16 px-4 border-b border-gray-200 dark:border-zinc-700">
         <div className="max-w-7xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-800 dark:text-white mb-4">
@@ -72,8 +105,8 @@ export default function Home() {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {foods.map((food) => (
-              <FoodCard key={food.id} food={food} />
+            {foods.map((food, index) => (
+              <FoodCard key={index} food={food} />
             ))}
           </div>
         )}

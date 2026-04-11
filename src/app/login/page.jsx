@@ -1,13 +1,17 @@
 "use client";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 import axiosSecure from "../api/axiosSecure";
 import Swal from "sweetalert2";
+import { AuthContext } from "../AuthProvider";
+import { useRouter } from "next/navigation";
 
 const LoginPage = () => {
+  const router = useRouter();
+  const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLoginForm = (e) => {
@@ -49,6 +53,7 @@ const LoginPage = () => {
     axiosSecure
       .post("/login", formData)
       .then((res) => {
+        login(res.data.user);
         Swal.fire({
           icon: "success",
           title: "Login Successful",
@@ -56,6 +61,7 @@ const LoginPage = () => {
           confirmButtonText: "OK",
         });
         form.reset();
+        router.push("/");
       })
       .catch((err) => {
         Swal.fire({

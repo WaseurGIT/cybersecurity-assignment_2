@@ -2,6 +2,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import FoodCard from "./components/FoodCard/page";
+import Link from "next/link";
 
 export default function Home() {
   const [foods, setFoods] = useState([]);
@@ -26,13 +27,13 @@ export default function Home() {
 
       <div className="my-5">
         {navLinks.map((link) => (
-          <a
+          <Link
             key={link.name}
             href={link.path}
             className="text-orange-500 hover:underline mx-2"
           >
             {link.name}
-          </a>
+          </Link>
         ))}
       </div>
 

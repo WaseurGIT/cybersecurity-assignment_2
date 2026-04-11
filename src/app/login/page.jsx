@@ -1,16 +1,23 @@
-"use client"
+"use client";
+import Link from "next/link";
 import React from "react";
-import { FaUser, FaLock } from "react-icons/fa";
+import { FaUser, FaLock, FaArrowLeft } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 
 const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-orange-100 to-red-200 dark:from-zinc-900 dark:to-black">
+      <Link
+        href="/"
+        className="absolute top-5 left-80 text-orange-500 hover:underline flex items-center gap-1"
+      >
+        <FaArrowLeft />
+        Back to Home
+      </Link>
       <div className="flex w-[900px] h-[500px] bg-white dark:bg-zinc-900 rounded-2xl shadow-xl overflow-hidden">
-
         <div className="w-1/2 hidden md:block">
           <img
-            src="https://source.unsplash.com/featured/?restaurant,food"
+            src="https://i.ibb.co.com/k2tj6ZrT/roasted-beans.jpg"
             alt="restaurant"
             className="w-full h-full object-cover"
           />
@@ -21,9 +28,7 @@ const LoginPage = () => {
             Welcome Back 🍽️
           </h2>
 
-          <p className="text-gray-500 mb-6">
-            Login to explore delicious meals
-          </p>
+          <p className="text-gray-500 mb-6">Login to explore delicious meals</p>
 
           <div className="flex items-center border rounded-lg px-3 py-2 mb-4 bg-gray-50 dark:bg-zinc-800">
             <FaUser className="text-gray-400 mr-2" />
@@ -74,7 +79,6 @@ const LoginPage = () => {
               Sign up
             </span>
           </p>
-
         </div>
       </div>
     </div>

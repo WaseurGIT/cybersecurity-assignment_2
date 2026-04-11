@@ -74,7 +74,7 @@
     "category": "Beverages",
     "isAvailable": true,
     "calories": 500,
-    "image": "https://i.ibb.co.com/MxyjjChG/image.png"
+    "image": "https://i.ibb.co.com/7d8Ck4St/smoothie.jpg"
   },
   {
     "id": 8,
@@ -85,7 +85,7 @@
     "category": "Mexican",
     "isAvailable": true,
     "calories": 600,
-    "image": "https://i.ibb.co.com/YBWWpMwg/image.png"
+    "image": "https://i.ibb.co.com/LX0T5bvB/bakery.jpg"
   },
   {
     "id": 9,

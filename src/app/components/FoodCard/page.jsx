@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
+import { AuthContext } from "@/app/AuthProvider";
+import Link from "next/link";
+import React, { useContext } from "react";
 
 const FoodCard = ({ food }) => {
+  const {user} = useContext(AuthContext)
   return (
     <div className="bg-white dark:bg-zinc-900 shadow-md hover:shadow-lg rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 h-full flex flex-col">
       <div className="overflow-hidden h-48">
@@ -22,21 +25,35 @@ const FoodCard = ({ food }) => {
         </p>
 
         <div className="flex justify-between items-center mt-3 mb-3">
-          <span className="text-lg font-bold text-green-600 dark:text-green-400">${food.price}</span>
-          <span className="text-yellow-500 font-semibold">⭐ {food.rating}</span>
+          <span className="text-lg font-bold text-green-600 dark:text-green-400">
+            ${food.price}
+          </span>
+          <span className="text-yellow-500 font-semibold">
+            ⭐ {food.rating}
+          </span>
         </div>
 
         <p
           className={`text-xs md:text-sm font-semibold mb-4 ${
-            food.isAvailable ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"
+            food.isAvailable
+              ? "text-green-600 dark:text-green-400"
+              : "text-red-600 dark:text-red-400"
           }`}
         >
           {food.isAvailable ? "✓ Available" : "✗ Not Available"}
         </p>
 
-        <button className="mt-auto bg-orange-500 hover:bg-orange-600 w-full py-2 rounded-lg text-white font-semibold transition-colors duration-200">
+        {user ? <Link
+          href={`/foodDetails/${food._id}`}
+          className="mt-auto bg-orange-500 hover:bg-orange-600 w-full py-2 rounded-lg text-white font-semibold transition-colors duration-200 text-center"
+        >
           View Details
-        </button>
+        </Link> : <Link
+          href="/login"
+          className="mt-auto bg-orange-500 hover:bg-orange-600 w-full py-2 rounded-lg text-white font-semibold transition-colors duration-200 text-center"
+        >
+          Login to View Details
+        </Link>}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 "use client";
 import React, { createContext, useEffect, useState } from "react";
+import axiosSecure from "./api/axiosSecure";
 
 export const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
@@ -7,17 +8,17 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const res = await axiosSecure.get("/me");
+    axiosSecure
+      .get("/me")
+      .then((res) => {
         setUser(res.data);
-      } catch (err) {
+      })
+      .catch(() => {
         setUser(null);
-      } finally {
+      })
+      .finally(() => {
         setLoading(false);
-      }
-    };
-    checkUser();
+      });
   }, []);
 
   const login = (userData) => {

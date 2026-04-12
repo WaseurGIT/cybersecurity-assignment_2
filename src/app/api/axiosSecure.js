@@ -18,7 +18,8 @@
 import axios from "axios";
 
 const axiosSecure = axios.create({
-  baseURL: "http://localhost:5000",
+  // baseURL: "http://localhost:5000",
+  baseURL: "https://cybersecurity-assignment-2-server.onrender.com",
   withCredentials: true, // CRITICAL: This sends the cookie to the server
 });
 

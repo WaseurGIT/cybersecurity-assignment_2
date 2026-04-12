@@ -1,0 +1,555 @@
+================================================================================
+                    CYBER SECURITY ASSIGNMENT - FULL WORKFLOW
+================================================================================
+
+PROJECT OVERVIEW
+================================================================================
+A full-stack food ordering application with authentication and secure API 
+communication. Features user registration, login, food browsing, and detailed 
+food information with JWT-based authentication.
+
+================================================================================
+ARCHITECTURE
+================================================================================
+
+FRONTEND: Next.js (React)
+  - Location: cyber-assignment-frontend/
+  - Port: 3000
+  - Authentication: Context API + JWT tokens
+  - Features: User auth, food listing, food details
+
+BACKEND: Express.js + MongoDB
+  - Location: Backend Server
+  - Port: 5000
+  - Database: MongoDB Atlas
+  - Authentication: JWT + Bcrypt
+
+================================================================================
+USER JOURNEY - COMPLETE FLOW
+================================================================================
+
+1. INITIAL STATE (User Not Authenticated)
+   ├── User visits http://localhost:3000
+   ├── App checks AuthContext for user
+   ├── User is redirected to Login page (/login)
+   └── OR redirected to Register page if first time (/register)
+
+
+2. USER REGISTRATION
+   ├── User navigates to /register page
+   ├── Fills form: Name, Email, Password
+   ├── Submits form → POST /users (Backend)
+   │
+   ├── BACKEND PROCESSING:
+   │  ├── Receives: { name, email, password }
+   │  ├── Validates email is not already registered
+   │  ├── Hashes password using bcrypt (salt: 12)
+   │  ├── Creates user document in MongoDB:
+   │  │  {
+   │  │    _id: ObjectId,
+   │  │    name: "string",
+   │  │    email: "user@example.com",
+   │  │    password: "hashed_password",
+   │  │    createdAt: Date
+   │  │  }
+   │  ├── Generates JWT token (expires in 7 days)
+   │  ├── Sets secure HTTP-only cookie with token
+   │  └── Returns user data + success message
+   │
+   ├── FRONTEND RESPONSE:
+   │  ├── Receives: { message, user: { id, email, name } }
+   │  ├── Stores token in HTTP-only cookie (automatically)
+   │  ├── Updates AuthContext with user data
+   │  └── Redirects user to Food List page (/)
+
+
+3. USER LOGIN (Already Registered)
+   ├── User fills email and password
+   ├── Submits form → POST /login (Backend)
+   │
+   ├── BACKEND PROCESSING:
+   │  ├── Validates email and password provided
+   │  ├── Finds user in MongoDB by email
+   │  ├── Returns error if user not found
+   │  ├── Compares submitted password with hashed password (bcrypt)
+   │  ├── Returns error if password invalid
+   │  ├── Generates JWT token (expires in 1 hour)
+   │  ├── Sets secure HTTP-only cookie
+   │  └── Returns user data
+   │
+   ├── FRONTEND RESPONSE:
+   │  ├── Stores token automatically in cookies
+   │  ├── Updates AuthContext with user data
+   │  └── Redirects to Food List page (/)
+
+
+4. FOOD LISTING PAGE (/)
+   ├── Component: app/page.js
+   ├── On Mount:
+   │  ├── Checks if user is authenticated (AuthContext)
+   │  ├── Verifies token is valid (/me endpoint)
+   │  ├── Fetches all foods → GET /foods (Backend)
+   │  └── Displays food list
+   │
+   ├── BACKEND - GET /foods:
+   │  ├── No authentication required
+   │  ├── Returns all food documents from MongoDB
+   │  ├── Response: [ { id, name, price, image, category, ... }, ... ]
+   │  └── Returns to frontend
+   │
+   ├── FRONTEND DISPLAY:
+   │  ├── Maps through foods array
+   │  ├── Renders FoodCard component for each food
+   │  ├── FoodCard displays: Image, Name, Price, Rating, Category
+   │  ├── Each card is clickable
+   │  └── On card click → Navigate to food details page
+
+
+5. FOOD DETAILS PAGE (/foodDetails/[id])
+   ├── Component: app/foodDetails/[id]/page.jsx
+   ├── Route Parameters: id = Food ObjectId
+   │
+   ├── On Mount:
+   │  ├── Checks user authentication
+   │  ├── Extracts food ID from URL params
+   │  ├── Calls → GET /foods/:id (Backend)
+   │  └── Displays loading state while fetching
+   │
+   ├── BACKEND - GET /foods/:id:
+   │  ├── Receives: foodId from URL params
+   │  ├── Queries MongoDB: foodsCollection.findOne({ _id: ObjectId(foodId) })
+   │  ├── Returns single food document with full details:
+   │  │  {
+   │  │    _id: ObjectId,
+   │  │    name: "Cheese Burger",
+   │  │    price: 5.99,
+   │  │    rating: 4.5,
+   │  │    ingredients: ["Cheese", "Lettuce", "Tomato", "Onion", "Bun"],
+   │  │    category: "Fast Food",
+   │  │    isAvailable: true,
+   │  │    calories: 550,
+   │  │    image: "https://i.ibb.co.com/b5LBZZ3W/image.png",
+   │  │    description: "...",
+   │  │    createdAt: Date
+   │  │  }
+   │  ├── Returns 404 if food not found
+   │  └── Returns to frontend
+   │
+   ├── FRONTEND DISPLAY:
+   │  ├── Receives food data
+   │  ├── Shows high-quality UI with:
+   │  │  ├── Large product image with hover effects
+   │  │  ├── Food name and category badge
+   │  │  ├── Rating display (⭐)
+   │  │  ├── Calorie information (🔥)
+   │  │  ├── Price in large bold text
+   │  │  ├── Availability status badge
+   │  │  ├── Ingredients as interactive tags
+   │  │  ├── Description section
+   │  │  ├── "Add to Cart" button
+   │  │  └── "Save" button
+   │  └── User can interact with buttons
+
+
+6. AUTHENTICATION CHECK (/me)
+   ├── Called on app initialization
+   ├── Endpoint: GET /me (Protected)
+   │
+   ├── BACKEND - GET /me:
+   │  ├── Middleware: verifyToken checks for valid JWT
+   │  │  ├── Looks for token in cookies or Authorization header
+   │  │  ├── Decodes JWT using JWT_SECRET
+   │  │  ├── Returns 401 if token invalid/missing
+   │  │  └── Adds decoded user info to req.user
+   │  ├── Finds user in MongoDB by email
+   │  ├── Returns: { id, email, name }
+   │  └── Frontend updates AuthContext
+
+
+7. USER LOGOUT
+   ├── User clicks logout button
+   ├── Calls → POST /logout (Backend)
+   │
+   ├── BACKEND - POST /logout:
+   │  ├── Clears access_token cookie
+   │  └── Returns success message
+   │
+   ├── FRONTEND:
+   │  ├── Clears AuthContext
+   │  ├── Removes token from cookies
+   │  └── Redirects to Login page
+
+
+================================================================================
+API ENDPOINTS SUMMARY
+================================================================================
+
+PUBLIC ENDPOINTS:
+├── GET /foods
+│   └── Returns all food items
+│
+└── GET /foods/:id
+    └── Returns specific food item by ID
+
+
+PROTECTED ENDPOINTS (Require Valid JWT):
+├── GET /me
+│   └── Returns current user info
+│
+├── POST /users (Registration)
+│   └── Creates new user account
+│
+├── POST /login
+│   └── Authenticates user and returns token
+│
+└── POST /logout
+    └── Clears user session
+
+
+================================================================================
+AUTHENTICATION FLOW
+================================================================================
+
+TOKEN LIFECYCLE:
+├── Registration: JWT created with 7-day expiration
+├── Login: JWT created with 1-hour expiration
+├── Storage: Stored in HTTP-only secure cookie
+├── Verification: Token checked via verifyToken middleware
+├── Refresh: New token generated on each login
+└── Logout: Token cleared from cookies
+
+SECURITY FEATURES:
+├── bcrypt: Password hashing (salt rounds: 12)
+├── JWT: Token-based authentication
+├── HTTP-Only Cookies: Prevents XSS attacks
+├── Secure Flag: Cookie only sent over HTTPS in production
+├── SameSite: Set to 'lax' to prevent CSRF attacks
+├── CORS: Whitelist localhost:3000 only
+└── Environment Variables: Sensitive data protected
+
+
+================================================================================
+DATABASE SCHEMA
+================================================================================
+
+USERS COLLECTION (MongoDB):
+{
+  _id: ObjectId,
+  name: String,
+  email: String (unique),
+  password: String (hashed with bcrypt),
+  createdAt: Date
+}
+
+FOODS COLLECTION (MongoDB):
+{
+  _id: ObjectId,
+  name: String,
+  price: Number,
+  rating: Number,
+  ingredients: Array[String],
+  category: String,
+  isAvailable: Boolean,
+  calories: Number,
+  image: String (URL),
+  description: String,
+  createdAt: Date
+}
+
+
+================================================================================
+DATA FLOW DIAGRAM
+================================================================================
+
+User Registration/Login:
+┌─────────┐     POST /users     ┌──────────┐     MongoDB     ┌─────────┐
+│Frontend │────or /login───────▶│ Backend  │───────conn────▶│MongoDB  │
+│(React)  │                      │(Express) │                │(Users)  │
+└─────────┘◀────JWT Token───────└──────────┘                └─────────┘
+    │           + Cookie
+    └──▶ Stores in HTTP-only Cookie
+
+Food Data Retrieval:
+┌─────────┐     GET /foods      ┌──────────┐     MongoDB     ┌─────────┐
+│Frontend │     GET /foods/:id  │ Backend  │───────query───▶│MongoDB  │
+│(React)  │────────────────────▶│(Express) │                │(Foods)  │
+└─────────┘◀───Food JSON Data──└──────────┘                └─────────┘
+
+
+================================================================================
+USER EXPERIENCE FLOW
+================================================================================
+
+Step 1: Launch Application
+  ├─ User opens http://localhost:3000
+  ├─ App initialized with AuthProvider wrapper
+  └─ AuthContext checked for existing session
+
+Step 2: Not Logged In?
+  ├─ Redirected to /login
+  ├─ Options: Login OR Register
+
+Step 3: Register (New User)
+  ├─ Fill: Name, Email, Password
+  ├─ Submit form
+  ├─ Backend creates user + generates token
+  └─ Redirected to food list page
+
+Step 4: Login (Existing User)
+  ├─ Enter: Email, Password
+  ├─ Submit form
+  ├─ Backend validates + generates token
+  └─ Redirected to food list page
+
+Step 5: Browse Foods
+  ├─ View list of all food items
+  ├─ See: Image, Name, Price, Category
+  ├─ Click on any food card
+  └─ Navigate to detailed view
+
+Step 6: View Food Details
+  ├─ See large product image
+  ├─ View full information:
+  │  ├─ Name, Category, Price
+  │  ├─ Rating & Calories
+  │  ├─ Ingredients list
+  │  ├─ Description
+  │  └─ Availability status
+  ├─ Add to cart (future feature)
+  └─ Save to favorites (future feature)
+
+Step 7: Logout
+  ├─ Click logout
+  ├─ Token cleared from cookies
+  └─ Redirected to login page
+
+
+================================================================================
+ERROR HANDLING
+================================================================================
+
+Frontend Errors:
+├─ Network error → "Failed to fetch data"
+├─ User not authenticated → Redirect to /login
+└─ Food not found → Display 404 message
+
+Backend Errors:
+├─ Invalid token → 401 Unauthorized
+├─ User already exists → 400 Bad Request
+├─ Invalid credentials → 400 Bad Request
+├─ Food not found → 404 Not Found
+├─ Server error → 500 Internal Server Error
+└─ All errors logged to console
+
+
+================================================================================
+ENVIRONMENT VARIABLES
+================================================================================
+
+BACKEND (.env):
+├── DB_USER: MongoDB Atlas username
+├── DB_PASS: MongoDB Atlas password
+├── JWT_SECRET: Secret key for JWT signing
+├── NODE_ENV: "production" or "development"
+└── PORT: Server port (default: 5000)
+
+FRONTEND (.env.local):
+├── NEXT_PUBLIC_API_URL: Backend API URL (http://localhost:5000)
+└── (Tokens stored in HTTP-only cookies - automatic)
+
+
+================================================================================
+SECURITY CHECKLIST
+================================================================================
+
+✓ Passwords hashed with bcrypt (12 rounds)
+✓ JWT tokens with expiration
+✓ HTTP-only cookies (XSS protection)
+✓ Secure flag on cookies (HTTPS in production)
+✓ SameSite cookie attribute (CSRF protection)
+✓ CORS whitelist configured
+✓ Environment variables for sensitive data
+✓ Input validation on backend
+✓ Token verification middleware
+✓ Password verification using bcrypt.compare()
+
+COULD BE IMPROVED:
+├─ Rate limiting on auth endpoints
+├─ Input sanitization
+├─ Refresh token implementation
+├─ Two-factor authentication
+└─ Database query optimization
+
+
+================================================================================
+COMPLETE REQUEST/RESPONSE EXAMPLES
+================================================================================
+
+1. REGISTRATION REQUEST:
+───────────────────────────────────────
+POST /users
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePassword123"
+}
+
+RESPONSE (201 Created):
+{
+  "message": "User created successfully",
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "john@example.com",
+    "name": "John Doe"
+  }
+}
+Cookie: access_token=eyJhbGciOiJIUzI1NiIs...; HttpOnly; Secure; SameSite=Lax
+
+
+2. LOGIN REQUEST:
+───────────────────────────────────────
+POST /login
+Content-Type: application/json
+
+{
+  "email": "john@example.com",
+  "password": "SecurePassword123"
+}
+
+RESPONSE (200 OK):
+{
+  "user": {
+    "id": "507f1f77bcf86cd799439011",
+    "email": "john@example.com",
+    "name": "John Doe"
+  }
+}
+Cookie: access_token=eyJhbGciOiJIUzI1NiIs...; HttpOnly; Secure; SameSite=Lax
+
+
+3. GET ALL FOODS REQUEST:
+───────────────────────────────────────
+GET /foods
+
+RESPONSE (200 OK):
+[
+  {
+    "_id": "607f1f77bcf86cd799439012",
+    "name": "Cheese Burger",
+    "price": 5.99,
+    "rating": 4.5,
+    "category": "Fast Food",
+    "image": "https://i.ibb.co.com/b5LBZZ3W/image.png",
+    "isAvailable": true,
+    "calories": 550,
+    "ingredients": ["Cheese", "Lettuce", "Tomato", "Onion", "Bun"],
+    "description": "Delicious cheese burger with fresh ingredients",
+    "createdAt": "2024-01-15T10:30:00Z"
+  },
+  ...more foods
+]
+
+
+4. GET FOOD BY ID REQUEST:
+───────────────────────────────────────
+GET /foods/607f1f77bcf86cd799439012
+Cookie: access_token=eyJhbGciOiJIUzI1NiIs...
+
+RESPONSE (200 OK):
+{
+  "food": {
+    "_id": "607f1f77bcf86cd799439012",
+    "name": "Cheese Burger",
+    "price": 5.99,
+    "rating": 4.5,
+    "category": "Fast Food",
+    "image": "https://i.ibb.co.com/b5LBZZ3W/image.png",
+    "isAvailable": true,
+    "calories": 550,
+    "ingredients": ["Cheese", "Lettuce", "Tomato", "Onion", "Bun"],
+    "description": "Delicious cheese burger with fresh ingredients",
+    "createdAt": "2024-01-15T10:30:00Z"
+  }
+}
+
+
+5. GET CURRENT USER REQUEST:
+───────────────────────────────────────
+GET /me
+Cookie: access_token=eyJhbGciOiJIUzI1NiIs...
+
+RESPONSE (200 OK):
+{
+  "id": "507f1f77bcf86cd799439011",
+  "email": "john@example.com",
+  "name": "John Doe"
+}
+
+RESPONSE (401 Unauthorized):
+{
+  "message": "Invalid token"
+}
+
+
+================================================================================
+DEPLOYMENT & RUNNING THE PROJECT
+================================================================================
+
+FRONTEND SETUP:
+├─ Install dependencies: npm install
+├─ Create .env.local file
+├─ Set: NEXT_PUBLIC_API_URL=http://localhost:5000
+├─ Run dev server: npm run dev
+└─ Access: http://localhost:3000
+
+BACKEND SETUP:
+├─ Install dependencies: npm install
+├─ Create .env file with MongoDB credentials
+├─ Set: JWT_SECRET, DB_USER, DB_PASS, PORT
+├─ Run server: npm start (or nodemon for development)
+└─ Server listens on: http://localhost:5000
+
+DATABASE SETUP:
+├─ Create MongoDB Atlas account
+├─ Create cluster (free tier available)
+├─ Create database: "cyberSecurityAssignment"
+├─ Create collections: "users", "foods"
+└─ Add sample food documents
+
+
+================================================================================
+FUTURE ENHANCEMENTS
+================================================================================
+
+Phase 2 - Shopping Cart:
+├─ Add to cart functionality
+├─ Cart persistence (localStorage/backend)
+├─ Order creation and checkout
+└─ Order history for users
+
+Phase 3 - Payment Integration:
+├─ Stripe/PayPal integration
+├─ Payment processing
+├─ Invoice generation
+└─ Refund handling
+
+Phase 4 - Admin Dashboard:
+├─ Add/edit/delete foods
+├─ View all orders
+├─ User management
+└─ Analytics
+
+Phase 5 - Advanced Features:
+├─ Food search and filtering
+├─ Reviews and ratings
+├─ Favorites/wishlist
+├─ Email notifications
+├─ Real-time order tracking
+└─ Multiple payment methods
+
+
+================================================================================
+END OF WORKFLOW DOCUMENT
+================================================================================

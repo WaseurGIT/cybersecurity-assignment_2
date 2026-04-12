@@ -1,4 +1,5 @@
 "use client";
+import axiosSecure from "@/app/api/axiosSecure";
 import { AuthContext } from "@/app/AuthProvider";
 import axios from "axios";
 import { useParams } from "next/navigation";
@@ -19,8 +20,8 @@ const Page = () => {
 
     if (!id) return;
 
-    axios
-      .get(`http://localhost:5000/foods/${id}`)
+    axiosSecure
+      .get(`/foods/${id}`)
       .then((res) => {
         console.log(res.data.food);
         setFood(res.data.food);

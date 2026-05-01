@@ -13,57 +13,53 @@ const LoginPage = () => {
   const router = useRouter();
   const { login } = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
+  const [step, setStep] = useState("password");
+  const [loginEmail, setLoginEmail] = useState("");
+  const [otp, setOtp] = useState("");
 
-  const handleLoginForm = (e) => {
+  const handleLoginForm = async (e) => {
     e.preventDefault();
     const form = e.target;
-    const email = form.email.value;
-    const password = form.password.value;
 
-    if (!email || !password) {
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: "Please fill in all required fields.",
-        confirmButtonText: "OK",
-      });
-      return;
-    } else if (password.length < 6) {
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: "Password must be at least 6 characters long.",
-        confirmButtonText: "OK",
-      });
-      return;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      Swal.fire({
-        icon: "error",
-        title: "Login Failed",
-        text: "Please enter a valid email address.",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-    const formData = {
-      email,
-      password,
-    };
+    if (step === "password") {
+      const email = form.email.value;
+      const password = form.password.value;
 
-    axiosSecure
-      .post("/login", formData)
-      .then((res) => {
-        login(res.data.user);
+      if (!email || !password) {
         Swal.fire({
-          icon: "success",
-          title: "Login Successful",
-          text: "You have logged in successfully!",
+          icon: "error",
+          title: "Login Failed",
+          text: "Please fill in all required fields.",
           confirmButtonText: "OK",
         });
-        form.reset();
-        router.push("/");
-      })
-      .catch((err) => {
+        return;
+      }
+
+      if (!/\S+@\S+\.\S+/.test(email)) {
+        Swal.fire({
+          icon: "error",
+          title: "Login Failed",
+          text: "Please enter a valid email address.",
+          confirmButtonText: "OK",
+        });
+        return;
+      }
+
+      try {
+        const res = await axiosSecure.post("/login", { email, password });
+
+        if (res.data.requiresTwoFactor) {
+          setLoginEmail(res.data.email);
+          setStep("otp");
+          Swal.fire({
+            icon: "info",
+            title: "Verification code sent",
+            text: "Check your email and enter the OTP.",
+            confirmButtonText: "OK",
+          });
+          return;
+        }
+      } catch (err) {
         Swal.fire({
           icon: "error",
           title: "Login Failed",
@@ -71,7 +67,38 @@ const LoginPage = () => {
             err.response?.data?.message || "An error occurred during login.",
           confirmButtonText: "OK",
         });
-      });
+      }
+    }
+
+    if (step === "otp") {
+      try {
+        const res = await axiosSecure.post("/verify-2fa", {
+          email: loginEmail,
+          otp,
+        });
+
+        login(res.data.user);
+
+        Swal.fire({
+          icon: "success",
+          title: "Login Successful",
+          text: "You have logged in successfully!",
+          confirmButtonText: "OK",
+        });
+
+        form.reset();
+        setStep("password");
+        setOtp("");
+        router.push("/");
+      } catch (err) {
+        Swal.fire({
+          icon: "error",
+          title: "Verification Failed",
+          text: err.response?.data?.message || "Invalid verification code.",
+          confirmButtonText: "OK",
+        });
+      }
+    }
   };
 
   return (
@@ -137,24 +164,35 @@ const LoginPage = () => {
             </button>
           </div>
 
+          {step === "otp" && (
+            <div className="flex items-center border-2 border-gray-300 dark:border-zinc-700 rounded-lg px-4 py-3 mb-4 bg-gray-50 dark:bg-zinc-800 hover:border-orange-500 transition-colors">
+              <input
+                type="text"
+                name="otp"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="Enter OTP"
+                className="w-full bg-transparent outline-none text-gray-700 dark:text-white placeholder-gray-500"
+                required
+              />
+            </div>
+          )}
+
           <div className="flex justify-between items-center text-sm mb-6">
             <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
               <input type="checkbox" className="cursor-pointer" />
               Remember me
             </label>
             <a
-              href="#"
+              href="/forgot-password"
               className="text-orange-500 hover:text-orange-600 font-medium transition-colors"
             >
               Forgot password?
             </a>
           </div>
 
-          <button
-            type="submit"
-            className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg"
-          >
-            Login
+          <button type="submit" className="...">
+            {step === "password" ? "Login" : "Verify OTP"}
           </button>
 
           <div className="flex items-center my-6">

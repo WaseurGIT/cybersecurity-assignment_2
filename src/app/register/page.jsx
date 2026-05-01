@@ -70,9 +70,11 @@ export default function RegisterPage() {
       name,
       email,
       password,
+      confirmPassword,
     };
 
-    axiosSecure.post("/users", formData)
+    axiosSecure
+      .post("/users", formData)
       .then((res) => {
         Swal.fire({
           icon: "success",
@@ -81,7 +83,7 @@ export default function RegisterPage() {
           confirmButtonText: "OK",
         });
         form.reset();
-        router.push('/');
+        router.push("/login");
       })
       .catch((err) => {
         Swal.fire({

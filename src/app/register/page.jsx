@@ -149,6 +149,13 @@ export default function RegisterPage() {
             />
           </div>
 
+          <div className="mb-2">
+            <p className="text-xs text-red-500">
+              Password must contain at least 8 characters (uppercase,
+              lowercase, number, special character).
+            </p>
+          </div>
+
           <div className="flex items-center border-2 border-gray-300 dark:border-zinc-700 rounded-lg px-4 py-3 mb-4 bg-gray-50 dark:bg-zinc-800 hover:border-orange-500 transition-colors">
             <FaLock className="text-gray-500 dark:text-gray-400 mr-3" />
             <input

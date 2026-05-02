@@ -179,10 +179,10 @@ const LoginPage = () => {
           )}
 
           <div className="flex justify-between items-center text-sm mb-6">
-            <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
+            {/* <label className="flex items-center gap-2 text-gray-600 dark:text-gray-400 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200">
               <input type="checkbox" className="cursor-pointer" />
               Remember me
-            </label>
+            </label> */}
             <a
               href="/forgot-password"
               className="text-orange-500 hover:text-orange-600 font-medium transition-colors"
@@ -191,7 +191,7 @@ const LoginPage = () => {
             </a>
           </div>
 
-          <button type="submit" className="...">
+          <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 rounded-lg transition duration-300 shadow-md hover:shadow-lg">
             {step === "password" ? "Login" : "Verify OTP"}
           </button>
 

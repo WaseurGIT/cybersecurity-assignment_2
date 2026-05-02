@@ -38,17 +38,17 @@ export default function ResetPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decorative elements */}
-      <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
-      <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+      {/* <div className="absolute top-0 left-0 w-96 h-96 bg-orange-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-red-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div> */}
 
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl shadow-2xl p-8 border border-slate-700 backdrop-blur-sm relative z-10"
+        className="w-full max-w-7xl mx-auto  rounded-2xl shadow-2xl p-8 backdrop-blur-sm relative z-10"
       >
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-400 to-red-400 bg-clip-text text-transparent mb-3">
+        <div className="py-4 mb-8 text-center">
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent mb-3">
             Reset Password
           </h1>
           <p className="text-slate-400 text-sm leading-relaxed">
@@ -56,22 +56,22 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <div className="relative mb-5 group">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg opacity-0 group-focus-within:opacity-100 transition duration-300 blur"></div>
+        <div className="relative mb-5 group border border-slate-600">
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg opacity-0 group-focus-within:opacity-100 transition duration-300 blur"></div>
           <div className="relative flex items-center border border-slate-600 group-focus-within:border-orange-400 rounded-lg px-4 py-3 bg-slate-700 transition-all duration-200">
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="New password"
-              className="w-full bg-transparent outline-none text-slate-100 placeholder-slate-500 text-sm"
+              className="w-full bg-transparent outline-none text-sm"
               required
             />
           </div>
         </div>
 
-        <div className="relative mb-6 group">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg opacity-0 group-focus-within:opacity-100 transition duration-300 blur"></div>
+        <div className="relative mb-6 group border border-slate-600">
+          <div className="absolute inset-0 z-0 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg opacity-0 group-focus-within:opacity-100 transition duration-300 blur"></div>
           <div className="relative flex items-center border border-slate-600 group-focus-within:border-orange-400 rounded-lg px-4 py-3 bg-slate-700 transition-all duration-200">
             <input
               type="password"
@@ -86,7 +86,7 @@ export default function ResetPasswordPage() {
 
         <button
           type="submit"
-          className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-orange-500/50"
+          className="w-full bg-green-500 cursor-pointer font-semibold py-3 rounded-lg transition-all duration-200 transform hover:scale-[1.02] active:scale-95 shadow-lg hover:shadow-orange-500/50"
         >
           Update Password
         </button>
